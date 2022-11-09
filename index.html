@@ -149,7 +149,6 @@
 		function init() {
 			let dateIndex = Math.floor(dateDiffInDays(new Date('2022-11-9'), new Date()) / 7);
 
-			console.log(dateIndex);
 			const rand = mulberry32(TSH(dateIndex + 'Fairydale'));
 
 			if (dateIndex > prompts.length - 1) {
