@@ -31,6 +31,16 @@
 			display: grid;
 		}
 
+		a {
+			text-decoration: none;
+			color: #fff;
+			transition: opacity .2s ease-in;
+		}
+
+		a:hover {
+			opacity: .5;
+		}
+
 		body {
 			margin: 0;
 			padding: .5rem;
@@ -68,6 +78,10 @@
 			animation-duration: 4s;
 			animation-delay: 2s;
 			animation-fill-mode: backwards;
+		}
+
+		.prompt:first-letter {
+			text-transform: uppercase;
 		}
 
 		p:nth-child(3) {
@@ -162,8 +176,12 @@
 			ctx.putImageData(imageData, 0, 0);
 			document.documentElement.style.setProperty('--background-image', "url('" + canvas.toDataURL() + "')");
 
-			const alternatePrompt = adjectives[Math.floor(rand() * adjectives.length)] + ' ' + nouns[Math.floor(rand() * nouns.length)];
-			document.getElementById('promptAlt').innerHTML = '<a href="https://www.thefreedictionary.com/' +  + '">' + alternatePrompt[0].toUpperCase() + alternatePrompt.slice(1);
+			const alternatePrompt = [
+				adjectives[Math.floor(rand() * adjectives.length)],
+				nouns[Math.floor(rand() * nouns.length)]
+			];
+
+			document.getElementById('promptAlt').innerHTML = '<a target="_blank" href="https://www.thefreedictionary.com/' + alternatePrompt[0] + '">' + alternatePrompt[0] + '</a> <a target="_blank" href="https://www.thefreedictionary.com/' + alternatePrompt[1] + '">' + alternatePrompt[1] + '</a>';
 		}
 
 		init();
