@@ -11,7 +11,6 @@
 
 		html {
 			box-sizing: border-box;
-			font-size: 40px;
 		}
 
 		*,
@@ -30,12 +29,11 @@
 		html {
 			height: 100%;
 			display: grid;
-			min-width: 320px;
 		}
 
 		body {
 			margin: 0;
-			padding: .25rem;
+			padding: .5rem;
 			font-family: Iowan Old Style, Apple Garamond, Baskerville, Times New Roman, Droid Serif, Times, Source Serif Pro, serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
 			background-color: #000;
 			color: #fff;
@@ -45,17 +43,18 @@
 		}
 
 		.container {
-			z-index: 1;
 			margin: auto;
 			text-align: center;
 			word-wrap: break-word;
 			background-color: rgba(0, 0, 0, .85);
 			box-shadow: 0 6px 4px rgba(0, 0, 0, .25);
-			padding: .5rem .8rem;
+			padding: 1rem 1.4rem;
 			border-radius: 8px;
 		}
 
 		.lead {
+			color: rgba(255, 255, 255, .65);
+			font-size: calc(.7rem + 6vmin);
 			margin-bottom: .5rem;
 			user-select: none;
 			animation-name: appear;
@@ -64,7 +63,7 @@
 		}
 
 		.prompt {
-			font-size: 60px;
+			font-size: calc(1rem + 7vmin);
 			animation-name: appear;
 			animation-duration: 4s;
 			animation-delay: 2s;
@@ -94,7 +93,7 @@
 </head>
 <body>
 	<div class="container">
-		<p class="lead">This week's prompt is...</p>
+		<p class="lead">This week's prompt is</p>
 		<p class="prompt" id="prompt"></p>
 		<p class="lead">or</p>
 		<p class="prompt" id="promptAlt"></p>
@@ -164,7 +163,7 @@
 			document.documentElement.style.setProperty('--background-image', "url('" + canvas.toDataURL() + "')");
 
 			const alternatePrompt = adjectives[Math.floor(rand() * adjectives.length)] + ' ' + nouns[Math.floor(rand() * nouns.length)];
-			document.getElementById('promptAlt').textContent = alternatePrompt[0].toUpperCase() + alternatePrompt.slice(1);
+			document.getElementById('promptAlt').innerHTML = '<a href="https://www.thefreedictionary.com/' +  + '">' + alternatePrompt[0].toUpperCase() + alternatePrompt.slice(1);
 		}
 
 		init();
