@@ -20,10 +20,32 @@
 			box-sizing: inherit;
 		}
 
+		h1 {
+			font-size: 2rem;
+			margin-top: 0;
+			margin-bottom: 1rem;
+		}
+
+		h2 {
+			font-size: 1.5rem;
+			margin-top: 0;
+			margin-bottom: .5rem;
+		}
+
 		p {
 			margin: 0;
 			padding: 0;
 			font-weight: normal;
+		}
+
+		ol,
+		ul {
+			margin-top: 0;
+			margin-bottom: 1rem;
+		}
+
+		li {
+			margin-bottom: .35rem;
 		}
 
 		body,
@@ -32,19 +54,10 @@
 			display: grid;
 		}
 
-		a {
-			text-decoration: none;
-			color: #fff;
-			transition: opacity .2s ease-in;
-		}
-
-		a:hover {
-			opacity: .5;
-		}
-
 		body {
 			margin: 0;
 			padding: .5rem;
+			font-size: 16px;
 			font-family: Iowan Old Style, Apple Garamond, Baskerville, Times New Roman, Droid Serif, Times, Source Serif Pro, serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
 			background-color: #000;
 			color: #fff;
@@ -70,15 +83,15 @@
 			margin-bottom: .5rem;
 			user-select: none;
 			animation-name: appear;
-			animation-duration: 2s;
+			animation-duration: 1s;
 			animation-fill-mode: backwards;
 		}
 
 		.prompt {
 			font-size: calc(1rem + 7vmin);
 			animation-name: appear;
-			animation-duration: 4s;
-			animation-delay: 2s;
+			animation-duration: 1s;
+			animation-delay: 1s;
 			animation-fill-mode: backwards;
 		}
 
@@ -86,14 +99,113 @@
 			text-transform: uppercase;
 		}
 
+		.prompt span {
+			transition: opacity .15s ease-in;
+			cursor: pointer;
+		}
+
+		.prompt span:hover {
+			opacity: .5;
+		}
+
 		p:nth-child(3) {
 			margin-top: .5rem;
-			animation-delay: 4s;
+			animation-delay: 2s;
 			font-style: italic;
 		}
 
 		p:nth-child(4) {
-			animation-delay: 6s;
+			animation-delay: 3s;
+		}
+
+		.modal-backdrop {
+			display: block;
+			height: 100%;
+			width: 100%;
+			background: rgba(0, 0, 0, .5);
+			position: absolute;
+			top: 0;
+			left: 0;
+			opacity: 0;
+			display: none;
+			transition: opacity .2s ease-in;
+		}
+
+		.modal-header-container {
+			display: flex;
+		}
+
+		.modal-backdrop.changing {
+			display: block;
+		}
+
+		.modal-backdrop.show {
+			opacity: 1;
+			display: block;
+		}
+
+		.modal-content {
+			min-height: 100px;
+		}
+
+		.modal-content,
+		.modal-header-container {
+			min-width: calc(320px - 3rem);
+		}
+
+		.loader {
+			height: 60px;
+			width: 60px;
+			border-radius: 30px;
+			border: 8px solid white;
+			opacity: .8;
+			margin: auto;
+			animation: spin 1s linear infinite;
+			position: relative;
+		}
+
+		.loader::after {
+			content: '';
+			display: block;
+			height: 16px;
+			width: 16px;
+			background: #000;
+			top: -6px;
+			left: 0;
+			position: absolute;
+			transform: rotate(60deg);
+		}
+
+		.close-button {
+			cursor: pointer;
+			background: transparent;
+			border: none;
+			color: #fff;
+			margin: 0 0 auto auto;
+			float: right;
+			font-size: 2rem;
+			height: 2rem;
+			width: 2rem;
+			line-height: 1;
+			transition: opacity .15s ease-in;
+		}
+
+		.close-button:hover {
+			opacity: .5;
+		}
+
+		.modal {
+			position: absolute;
+			background: #000;
+			padding: 1rem;
+			border-radius: 8px;
+			overflow: auto;
+			max-height: calc(100% - 1rem);
+			width: calc(100% - 1rem);
+			max-width: 500px;
+			left: 50%;
+			top: 50%;
+			transform: translate(-50%, -50%);
 		}
 
 		@keyframes appear {
@@ -125,6 +237,16 @@
 				background-position-x: 1900px;
 			}
 		}
+
+		@keyframes spin {
+			from {
+				transform: rotate(0deg);
+			}
+
+			to {
+				transform: rotate(360deg);
+			}
+		}
 	</style>
 </head>
 <body>
@@ -133,6 +255,16 @@
 		<p class="prompt" id="prompt"></p>
 		<p class="lead">or</p>
 		<p class="prompt" id="promptAlt"></p>
+	</div>
+
+	<div id="modal" class="modal-backdrop">
+		<div class="modal">
+			<div class="modal-header-container">
+				<h1 id="modal-header"></h1>
+				<button data-action="close" class="close-button" title="Close">×</button>
+			</div>
+			<div id="modal-content" class="modal-content"></div>
+		</div>
 	</div>
 
 	<script type="text/javascript" src="data.js"></script>
@@ -166,11 +298,19 @@
 
 			const rand = mulberry32(TSH(dateIndex + 'Fairydale'));
 
+			if (localStorage.getItem('week') != dateIndex) {
+				localStorage.clear();
+			}
+
+			localStorage.setItem('week', dateIndex);
+
 			if (dateIndex > prompts.length - 1) {
 				dateIndex = dateIndex % prompts.length;
 			}
 
-			document.getElementById('prompt').textContent = prompts[dateIndex];
+			prompts[dateIndex].split(' ').forEach((word, index) => {
+				document.getElementById('prompt').insertAdjacentHTML('beforeend', '<span title="Show dictionary definition" data-word="' + word.toLowerCase() + '">' + word + '</span>' + (index === word.length - 1 ? '' : ' '));
+			});
 
 			const palette = palettes[Math.floor(rand() * palettes.length)];
 
@@ -205,10 +345,97 @@
 
 			document.documentElement.style.setProperty('--background-animation', (Math.floor(rand() * 240 + 120)) + 's linear ' + (rand() < .5 ? 'normal' : 'reverse') + ' infinite backgroundX, ' + (Math.floor(rand() * 240 + 120)) + 's linear ' + (rand() < .5 ? 'normal' : 'reverse') + ' infinite backgroundY');
 
-			document.getElementById('promptAlt').innerHTML = '<a target="_blank" href="https://www.thefreedictionary.com/' + alternatePrompt[0] + '">' + alternatePrompt[0] + '</a> <a target="_blank" href="https://www.thefreedictionary.com/' + alternatePrompt[1] + '">' + alternatePrompt[1] + '</a>';
+			document.getElementById('promptAlt').innerHTML = '<span title="Get dictionary definition" data-word="' + alternatePrompt[0] + '">' + alternatePrompt[0] + '</span> <span title="Get dictionary definition" data-word="' + alternatePrompt[1] + '">' + alternatePrompt[1] + '</span>';
+
+			document.addEventListener('click', event => {
+				if (event.target.dataset.word) {
+					setModal(event.target.dataset.word);
+				} else if (event.target.id === 'modal' || event.target.dataset.action === 'close') {
+					hideModal();
+				}
+			});
+
+			document.addEventListener('keydown', event => {
+				if (event.code === 'Escape') {
+					hideModal();
+				}
+			});
+		}
+
+		function setModal(word, error = false) {
+			const content = localStorage.getItem(word);
+
+			document.getElementById('modal-header').textContent = word[0].toUpperCase() + word.slice(1);
+			document.getElementById('modal-content').innerHTML = '<div class="loader"></div>';
+
+			if (!error && (!content || content.endsWith('sorry!</p>'))) {
+				getDefinition(word);
+			} else {
+				document.getElementById('modal-content').innerHTML = content;
+
+				document.getElementById('modal').classList.add('changing');
+
+				setTimeout(() => {
+					document.getElementById('modal').classList.add('show');
+
+					setTimeout(() => {
+						document.getElementById('modal').classList.remove('changing');
+					}, 200);
+				}, 10);
+			}
+		}
+
+		function hideModal() {
+			document.getElementById('modal').classList.add('changing');
+
+			setTimeout(() => {
+				document.getElementById('modal').classList.remove('show');
+
+				setTimeout(() => {
+					document.getElementById('modal').classList.remove('changing');
+				}, 200);
+			}, 10);
+		}
+
+		function getDefinition(word) {
+			fetch('https://en.wiktionary.org/api/rest_v1/page/definition/' + word)
+				.then(response => {
+					if (response.ok) {
+						return response.json();
+					} else {
+						throw new Error('The word "' + word + '" could not be found in the English dictionary, sorry!');
+					}
+				}).then(response => {
+					if (response['en']) {
+						let output = '';
+						response['en'].forEach(sense => {
+							output += '<h2>' + sense.partOfSpeech + '</h2><ol>';
+
+							sense.definitions.forEach(({definition}) => {
+								if (definition.length) {
+									output += '<li>' + definition.replaceAll(/<a .*?>(.*?)<\/a>/g, '$1').replaceAll(/<span.*?>(.*?)<\/span>/g, '$1').replaceAll(/<\/?([ou]l|li)>/g, '').replaceAll(/<link.*?>/g, '');
+
+									output += (output.endsWith('.') ? '' : '.') + '</li>';
+								}
+							});
+
+							output += '</ol>';
+						});
+
+						localStorage.setItem(word, output);
+
+						setModal(word);
+					} else {
+						throw new Error('The word "' + word + '" could not be found in the English dictionary, sorry!');
+					}
+				}).catch(error => {
+					localStorage.setItem(word, '<p>' + error.message + '</p>');
+
+					setModal(word, true);
+				});
 		}
 
 		init();
 	</script>
 </body>
-</html> 
+</html>
