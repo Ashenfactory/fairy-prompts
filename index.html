@@ -7,6 +7,7 @@
 	<style type="text/css">
 		:root {
 			--background-image: none;
+			--background-animation: none;
 		}
 
 		html {
@@ -50,6 +51,7 @@
 			background-image: var(--background-image);
 			backdrop-filter: blur(20px);
 			background-size: 1900px;
+			animation: var(--background-animation);
 		}
 
 		.container {
@@ -101,6 +103,26 @@
 
 			to {
 				opacity: 1;
+			}
+		}
+
+		@keyframes backgroundY {
+			from {
+				background-position-y: 0;
+			}
+
+			to {
+				background-position-y: 1900px;
+			}
+		}
+
+		@keyframes backgroundX {
+			from {
+				background-position-x: 0;
+			}
+
+			to {
+				background-position-x: 1900px;
 			}
 		}
 	</style>
@@ -180,6 +202,8 @@
 				adjectives[Math.floor(rand() * adjectives.length)],
 				nouns[Math.floor(rand() * nouns.length)]
 			];
+
+			document.documentElement.style.setProperty('--background-animation', (Math.floor(rand() * 240 + 120)) + 's linear ' + (rand() < .5 ? 'normal' : 'reverse') + ' infinite backgroundX, ' + (Math.floor(rand() * 240 + 120)) + 's linear ' + (rand() < .5 ? 'normal' : 'reverse') + ' infinite backgroundY');
 
 			document.getElementById('promptAlt').innerHTML = '<a target="_blank" href="https://www.thefreedictionary.com/' + alternatePrompt[0] + '">' + alternatePrompt[0] + '</a> <a target="_blank" href="https://www.thefreedictionary.com/' + alternatePrompt[1] + '">' + alternatePrompt[1] + '</a>';
 		}
