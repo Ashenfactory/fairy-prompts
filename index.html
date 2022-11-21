@@ -428,7 +428,7 @@
 								if (definition.length) {
 									output += '<li>' + definition.replaceAll(/<a .*?>(.*?)<\/a>/g, '$1').replaceAll(/<span.*?>(.*?)<\/span>/g, '$1').replaceAll(/<\/?([ou]l|li)>/g, '').replaceAll(/<link.*?>/g, '');
 
-									output += (output.endsWith('.') ? '' : '.') + '</li>';
+									output += (output.trim().endsWith('.') ? '' : '.') + '</li>';
 								}
 							});
 
