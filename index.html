@@ -434,8 +434,9 @@
 							sense.definitions.forEach(({definition}) => {
 								if (definition.length) {
 									output += '<li>' + definition
-										.replaceAll(/<(\w+).*?>/g, '<$1>')
-										.replaceAll(/<(?!\/?(strong|em|i|b)>).*?>/gi, '')
+										.replaceAll(/<!--.*?-->/gs, '')
+										.replaceAll(/<(\w+).*?>/gs, '<$1>')
+										.replaceAll(/<(?!\/?(strong|em|i|b)>).*?>/gis, '')
 										.trim()
 										.replace(/([^.]<.*?>|[^>.])$/, '$1.') + '</li>';
 								}
