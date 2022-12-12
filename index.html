@@ -377,17 +377,18 @@
 
 		function setModal(word) {
 			const content = localStorage.getItem(word);
+			const modal = document.getElementById('modal');
 
 			document.getElementById('modal-header').textContent = word[0].toUpperCase() + word.slice(1);
 			document.getElementById('modal-content').innerHTML = '<div class="loader"></div>';
 
-			document.getElementById('modal').classList.add('changing');
+			modal.classList.add('changing');
 
 			setTimeout(() => {
-				document.getElementById('modal').classList.add('show');
+				modal.classList.add('show');
 
 				setTimeout(() => {
-					document.getElementById('modal').classList.remove('changing');
+					modal.classList.remove('changing');
 				}, 200);
 			}, 10);
 
@@ -399,43 +400,51 @@
 		}
 
 		function hideModal() {
-			document.getElementById('modal').classList.add('changing');
+			const modal = document.getElementById('modal');
 
-			setTimeout(() => {
-				document.getElementById('modal').classList.remove('show');
+			if (modal.classList.contains('show')) {			
+				modal.classList.add('changing');
 
 				setTimeout(() => {
-					document.getElementById('modal').classList.remove('changing');
-				}, 200);
-			}, 10);
+					modal.classList.remove('show');
+
+					setTimeout(() => {
+						modal.classList.remove('changing');
+					}, 200);
+				}, 10);
+			}
 		}
 
-		function getDefinition(word) {
+		function getDefinition(word, retry = true) {
 			fetch('https://en.wiktionary.org/api/rest_v1/page/definition/' + word)
 				.then(response => {
 					if (response.ok) {
 						return response.json();
+					} else if (retry) {
+						return getDefinition(word[0].toUpperCase() + word.slice(1), false);
 					} else {
 						throw new Error('The word "' + word + '" could not be found in the English dictionary, sorry!');
 					}
 				}).then(response => {
-					if (response.en) {
+					if (response && response.en) {
 						let output = '';
 						response.en.forEach(sense => {
 							output += '<h2>' + sense.partOfSpeech + '</h2><ol>';
 
 							sense.definitions.forEach(({definition}) => {
 								if (definition.length) {
-									output += '<li>' + definition.replaceAll(/<a .*?>(.*?)<\/a>/g, '$1').replaceAll(/<span.*?>(.*?)<\/span>/g, '$1').replaceAll(/<\/?([ou]l|li)>/g, '').replaceAll(/<link.*?>/g, '');
-
-									output += (output.trim().endsWith('.') ? '' : '.') + '</li>';
+									output += '<li>' + definition
+										.replaceAll(/<(\w+).*?>/g, '<$1>')
+										.replaceAll(/<(?!\/?(strong|em|i|b)>).*?>/gi, '')
+										.trim()
+										.replace(/([^.]<.*?>|[^>.])$/, '$1.') + '</li>';
 								}
 							});
 
 							output += '</ol>';
 						});
 
-						localStorage.setItem(word, output);
+						localStorage.setItem(word.toLowerCase(), output);
 
 						document.getElementById('modal-content').innerHTML = output;
 					} else {
